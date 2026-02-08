@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National Lottery Portal - Ticket Verification</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(to right, #0b2a5b, #163f85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 15px;
+    }
+
+    .main-box {
+      width: 100%;
+      max-width: 520px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0px 10px 30px rgba(0,0,0,0.25);
+      overflow: hidden;
+      animation: fadeSlide 1s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0px); }
+    }
+
+    .header {
+      background: #0b2a5b;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 22px;
+    }
+
+    .user-info {
+      background: #f4f6fb;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 18px;
+      border: 1px solid #d6ddeb;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      color: #1c1c1c;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 14px;
+      border: 1px solid #cfd6e4;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 16px;
+      background: #0b2a5b;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #163f85;
+    }
+
+    button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+
+    #resultMsg {
+      margin-top: 18px;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    #winnerDisplay {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      display: none;
+      color: green;
+    }
+
+    #instructions {
+      margin-top: 15px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f4f6fb;
+      border: 1px solid #d6ddeb;
+    }
+
+    .footer {
+      background: #f4f6fb;
+      text-align: center;
+      padding: 14px;
+      font-size: 12px;
+      color: gray;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="main-box">
+    <div class="header">
+      <h1>NATIONAL LOTTERY PORTAL</h1>
+      <p>Ticket Verification System</p>
+    </div>
+
+    <div class="content">
+
+      <div class="user-info">
+        <p><b>Name:</b> <span id="displayName"></span></p>
+        <p><b>User ID:</b> <span id="displayID"></span></p>
+        <p><b>Status:</b> <span id="status">Active</span></p>
+      </div>
+
+      <label>Enter Lottery Ticket Number</label>
+      <input type="text" id="userLottery" placeholder="Enter ticket number" maxlength="6">
+
+      <button id="verifyBtn" onclick="checkWinner()">Verify Ticket</button>
+
+      <p id="resultMsg"></p>
+      <p id="winnerDisplay">Winning Ticket Number: <span id="winnerNo"></span></p>
+
+      <div id="instructions"></div>
+
+    </div>
+
+    <div class="footer">
+      © 2026 National Lottery Board. All Rights Reserved.
+    </div>
+  </div>
+
+  <script>
+    let winnerNumber = localStorage.getItem("generatedTicket") || 458600;
+    winnerNumber = parseInt(winnerNumber);
+
+    let prizeUSD = 1000000;
+    let usdToInrRate = 83;
+    let prizeINR = prizeUSD * usdToInrRate;
+
+    document.getElementById("userLottery").addEventListener("input", function () {
+      this.value = this.value.replace(/[^0-9]/g, "");
+    });
+
+    let username = localStorage.getItem("username");
+    let userid = localStorage.getItem("userid");
+
+    if (!username || !userid) {
+      window.location.href = "index.html";
+    }
+
+    document.getElementById("displayName").innerHTML = username;
+    document.getElementById("displayID").innerHTML = userid;
+
+    let attemptKey = "attempt_used_" + userid;
+
+    function lockUser() {
+      document.getElementById("status").innerHTML = "Locked";
+      document.getElementById("status").style.color = "red";
+      document.getElementById("userLottery").disabled = true;
+      document.getElementById("verifyBtn").disabled = true;
+    }
+
+    if (localStorage.getItem(attemptKey) === "true") {
+      lockUser();
+      document.getElementById("resultMsg").innerHTML =
+        "Ticket verification has already been completed for this User ID.";
+      document.getElementById("resultMsg").style.color = "red";
+    }
+
+    function formatINR(amount) {
+      return "₹" + amount.toLocaleString("en-IN");
+    }
+
+    function checkWinner() {
+      let userLottery = document.getElementById("userLottery").value;
+      let resultMsg = document.getElementById("resultMsg");
+      let winnerDisplay = document.getElementById("winnerDisplay");
+      let winnerNo = document.getElementById("winnerNo");
+      let instructions = document.getElementById("instructions");
+
+      resultMsg.innerHTML = "";
+      winnerDisplay.style.display = "none";
+      instructions.style.display = "none";
+
+      if (userLottery === "") {
+        resultMsg.innerHTML = "Please enter the ticket number.";
+        resultMsg.style.color = "red";
+        return;
+      }
+
+      if (userLottery.length !== 6) {
+        resultMsg.innerHTML = "Invalid ticket number format.";
+        resultMsg.style.color = "red";
+        return;
+      }
+
+      resultMsg.innerHTML = "Verifying ticket...";
+      resultMsg.style.color = "#0b2a5b";
+
+      setTimeout(() => {
+        localStorage.setItem(attemptKey, "true");
+        lockUser();
+
+        winnerNo.innerHTML = winnerNumber;
+        winnerDisplay.style.display = "block";
+
+        if (parseInt(userLottery) === winnerNumber) {
+          resultMsg.innerHTML = "Ticket verified successfully. You have won.";
+          resultMsg.style.color = "green";
+
+          instructions.style.display = "block";
+          instructions.style.color = "green";
+          instructions.innerHTML =
+            "<b>Prize Amount:</b> $1,000,000<br>" +
+            "<b>Equivalent Amount (INR):</b> " + formatINR(prizeINR) + "<br><br>" +
+            "Please contact the regional lottery office or authorized authorities " +
+            "to claim and withdraw your lottery amount.";
+
+        } else {
+          resultMsg.innerHTML = "Ticket verified successfully. Not a winning ticket.";
+          resultMsg.style.color = "red";
+        }
+
+      }, 1200);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National Lottery Portal - Login</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(to right, #0b2a5b, #163f85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 15px;
+    }
+
+    .main-box {
+      width: 100%;
+      max-width: 520px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0px 10px 30px rgba(0,0,0,0.25);
+      overflow: hidden;
+      animation: fadeSlide 1s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0px); }
+    }
+
+    .header {
+      background: #0b2a5b;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 22px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      color: #1c1c1c;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 14px;
+      border: 1px solid #cfd6e4;
+      border-radius: 10px;
+      outline: none;
+      transition: 0.25s ease;
+    }
+
+    input:focus {
+      border-color: #0b2a5b;
+      box-shadow: 0px 0px 8px rgba(11, 42, 91, 0.4);
+      transform: scale(1.02);
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 20px;
+      background: #0b2a5b;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background: #163f85;
+      transform: translateY(-2px);
+      box-shadow: 0px 6px 14px rgba(0,0,0,0.2);
+    }
+
+    #msg {
+      margin-top: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .extra-section {
+      margin-top: 18px;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #d6ddeb;
+      background: #f4f6fb;
+      text-align: center;
+    }
+
+    .extra-section p {
+      margin: 0;
+      font-size: 13px;
+      color: #444;
+      font-weight: 600;
+    }
+
+    .extra-section a {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      color: #0b2a5b;
+    }
+
+    .extra-section a:hover {
+      text-decoration: underline;
+      color: #163f85;
+    }
+
+    .footer {
+      background: #f4f6fb;
+      text-align: center;
+      padding: 14px;
+      font-size: 12px;
+      color: gray;
+    }
+
+    @media (max-width: 480px) {
+      .header h1 { font-size: 17px; }
+      .content { padding: 18px; }
+      input { font-size: 13px; padding: 11px; }
+      button { font-size: 14px; padding: 12px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="main-box">
+    <div class="header">
+      <h1>NATIONAL LOTTERY PORTAL</h1>
+      <p>Secure Login System</p>
+    </div>
+
+    <div class="content">
+      <label>Full Name</label>
+      <input type="text" id="name" placeholder="Enter your full name">
+
+      <label>Login ID</label>
+      <input type="text" id="userid" placeholder="Enter your Login ID" maxlength="6">
+
+      <button onclick="loginUser()">Continue</button>
+
+      <p id="msg"></p>
+
+      <div class="extra-section">
+        <p>Don't have a lottery ticket?</p>
+        <a href="generate.html">Generate your lottery ticket</a>
+      </div>
+    </div>
+
+    <div class="footer">
+      © 2026 National Lottery Board. All Rights Reserved.
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("userid").addEventListener("input", function () {
+      this.value = this.value.replace(/[^0-9]/g, "");
+    });
+
+    function loginUser() {
+      let name = document.getElementById("name").value.trim();
+      let userid = document.getElementById("userid").value.trim();
+      let msg = document.getElementById("msg");
+
+      msg.innerHTML = "";
+
+      if (name === "" || userid === "") {
+        msg.innerHTML = "Please enter name and login ID.";
+        msg.style.color = "red";
+        return;
+      }
+
+      if (userid.length !== 6) {
+        msg.innerHTML = "Login ID must be 6 digits.";
+        msg.style.color = "red";
+        return;
+      }
+
+      // Store user entered values
+      localStorage.setItem("username", name);
+      localStorage.setItem("userid", userid);
+
+      msg.innerHTML = "Logging in...";
+      msg.style.color = "green";
+
+      setTimeout(() => {
+        window.location.href = "lottery.html";
+      }, 900);
+    }
+  </script>
+
+</body>
+</html>

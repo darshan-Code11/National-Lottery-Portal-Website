@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National Lottery Portal - Generate Ticket</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(to right, #0b2a5b, #163f85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 15px;
+    }
+
+    .main-box {
+      width: 100%;
+      max-width: 620px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0px 10px 30px rgba(0,0,0,0.25);
+      overflow: hidden;
+      animation: fadeSlide 1s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0px); }
+    }
+
+    .header {
+      background: #0b2a5b;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 22px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      color: #1c1c1c;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      font-size: 14px;
+      border: 1px solid #cfd6e4;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 20px;
+      background: #0b2a5b;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #163f85;
+    }
+
+    .amount-box {
+      margin-top: 15px;
+      padding: 12px;
+      background: #f4f6fb;
+      border-radius: 10px;
+      border: 1px solid #d6ddeb;
+      font-weight: 700;
+      color: #0b2a5b;
+      text-align: center;
+    }
+
+    .qr-box {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid #d6ddeb;
+      background: #f4f6fb;
+      text-align: center;
+    }
+
+    .fake-qr {
+      width: 170px;
+      height: 170px;
+      background: repeating-linear-gradient(
+        45deg,
+        #000,
+        #000 10px,
+        #fff 10px,
+        #fff 20px
+      );
+      margin: 15px auto;
+      border-radius: 10px;
+      border: 5px solid white;
+    }
+
+    #timer {
+      font-size: 15px;
+      font-weight: 700;
+      color: red;
+      margin-top: 10px;
+    }
+
+    .ticket-box {
+      display: none;
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 12px;
+      border: 1px solid #d6ddeb;
+      background: #ffffff;
+      text-align: center;
+    }
+
+    .ticket-number {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0b2a5b;
+      margin: 10px 0;
+      letter-spacing: 2px;
+    }
+
+    .login-id {
+      font-size: 18px;
+      font-weight: 800;
+      color: #c33764;
+      margin: 8px 0;
+      letter-spacing: 2px;
+    }
+
+    .claim-msg {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .btn-group button {
+      flex: 1;
+      min-width: 170px;
+    }
+
+    .footer {
+      background: #f4f6fb;
+      text-align: center;
+      padding: 14px;
+      font-size: 12px;
+      color: gray;
+    }
+
+    @media (max-width: 480px) {
+      .header h1 { font-size: 17px; }
+      .content { padding: 18px; }
+      button { font-size: 14px; }
+      .ticket-number { font-size: 20px; }
+      .login-id { font-size: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="main-box">
+    <div class="header">
+      <h1>NATIONAL LOTTERY PORTAL</h1>
+      <p>Ticket Generation & Payment Portal</p>
+    </div>
+
+    <div class="content">
+
+      <label>Full Name</label>
+      <input type="text" id="name" placeholder="Enter your full name">
+
+      <label>Age</label>
+      <input type="number" id="age" placeholder="Enter your age">
+
+      <label>Aadhaar Number</label>
+      <input type="text" id="aadhaar" placeholder="Enter Aadhaar number" maxlength="12">
+
+      <div class="amount-box">
+        Ticket Price: ₹500
+      </div>
+
+      <label>Select Payment Method</label>
+      <select id="paymentMethod" onchange="showUPIOptions()">
+        <option value="">Select</option>
+        <option value="upi">UPI</option>
+        <option value="card">Credit / Debit Card</option>
+      </select>
+
+      <div id="upiOptions" style="display:none;">
+        <label>Select UPI App</label>
+        <select id="upiApp">
+          <option value="">Select</option>
+          <option value="paytm">Paytm</option>
+          <option value="phonepe">PhonePe</option>
+          <option value="gpay">Google Pay</option>
+          <option value="other">Other UPI</option>
+        </select>
+      </div>
+
+      <button onclick="startPayment()">Proceed to Payment</button>
+
+      <div class="qr-box" id="qrBox">
+        <h3>Scan QR Code to Pay</h3>
+        <div class="fake-qr"></div>
+        <p id="timer"></p>
+      </div>
+
+      <div class="ticket-box" id="ticketBox">
+        <h3>Lottery Ticket Generated Successfully</h3>
+
+        <p><b>Your Ticket Number:</b></p>
+        <div class="ticket-number" id="ticketNumber"></div>
+
+        <p><b>Your Login ID:</b></p>
+        <div class="login-id" id="loginID"></div>
+
+        <p class="claim-msg" id="claimDeadline"></p>
+
+        <div class="btn-group">
+          <button onclick="goLogin()">Go to Login Page</button>
+          <button onclick="goVerify()">Verify Ticket</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      © 2026 National Lottery Board. All Rights Reserved.
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("aadhaar").addEventListener("input", function () {
+      this.value = this.value.replace(/[^0-9]/g, "");
+    });
+
+    function showUPIOptions() {
+      let method = document.getElementById("paymentMethod").value;
+      document.getElementById("upiOptions").style.display = (method === "upi") ? "block" : "none";
+    }
+
+    function startPayment() {
+      let name = document.getElementById("name").value.trim();
+      let age = document.getElementById("age").value;
+      let aadhaar = document.getElementById("aadhaar").value.trim();
+      let method = document.getElementById("paymentMethod").value;
+
+      if (name === "" || age === "" || aadhaar === "" || method === "") {
+        alert("Please fill all required details.");
+        return;
+      }
+
+      if (age < 18) {
+        alert("You are not eligible to purchase a lottery ticket.");
+        return;
+      }
+
+      if (aadhaar.length !== 12) {
+        alert("Invalid Aadhaar number.");
+        return;
+      }
+
+      if (method === "upi") {
+        let upiApp = document.getElementById("upiApp").value;
+        if (upiApp === "") {
+          alert("Please select UPI app.");
+          return;
+        }
+      }
+
+      document.getElementById("qrBox").style.display = "block";
+      document.getElementById("ticketBox").style.display = "none";
+
+      startTimer();
+    }
+
+    function startTimer() {
+      let timeLeft = 60;
+      let timerElement = document.getElementById("timer");
+
+      timerElement.innerHTML = "Payment Time Remaining: " + timeLeft + " seconds";
+
+      let interval = setInterval(() => {
+        timeLeft--;
+        timerElement.innerHTML = "Payment Time Remaining: " + timeLeft + " seconds";
+
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          generateTicket();
+        }
+      }, 1000);
+    }
+
+    function generateTicket() {
+      document.getElementById("qrBox").style.display = "none";
+
+      let ticket = Math.floor(100000 + Math.random() * 900000);
+
+      let aadhaar = document.getElementById("aadhaar").value.trim();
+      let loginID = aadhaar.slice(-6);
+
+      let today = new Date();
+      let randomDays = Math.floor(Math.random() * 15) + 1;
+      today.setDate(today.getDate() + randomDays);
+
+      let deadline = today.toDateString();
+
+      document.getElementById("ticketNumber").innerHTML = ticket;
+      document.getElementById("loginID").innerHTML = loginID;
+
+      document.getElementById("claimDeadline").innerHTML =
+        "Ticket claim must be completed before: " + deadline;
+
+      document.getElementById("ticketBox").style.display = "block";
+
+      // Save automatic login details
+      localStorage.setItem("username", document.getElementById("name").value.trim());
+      localStorage.setItem("userid", loginID);
+
+      // Save ticket
+      localStorage.setItem("generatedTicket", ticket);
+      localStorage.setItem("generatedLoginID", loginID);
+    }
+
+    function goLogin() {
+      window.location.href = "index.html";
+    }
+
+    function goVerify() {
+      window.location.href = "lottery.html";
+    }
+  </script>
+
+</body>
+</html>
