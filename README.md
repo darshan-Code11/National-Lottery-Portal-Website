@@ -107,7 +107,7 @@ National-Lottery-Portal/
 Developed by **Darshan Gowda**
 
 ---
-acess the website:https://darshan-code11.github.io/National-Lottery-Portal-Website/lottery.html
+acess the website:[https://darshan-code11.github.io/National-Lottery-Portal-Website/lottery.html](https://darshan-code11.github.io/National-Lottery-Portal-Website/)
 
 ## License
 This project is for educational purposes only.
